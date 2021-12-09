@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Отчеты - Группа</h1>
+
+<div class="form_div">
+    <form method="post" action="/reports/group">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <select name="grid">
+            <option disabled selected>Выберите группу</option>
+                {% for gr in grs %}
+                    {% if grid == gr[2] %}
+                        <option selected name="grid" value="{{gr[0]}}">{{gr[5]}}-{{gr[2]}}</option>
+                    {% else %}
+                        <option name="grid" value="{{gr[0]}}">{{gr[5]}}-{{gr[2]}}</option>
+                    {% endif %}
+                {% endfor %}
+        </select>
+        <select name="prid">
+            <option disabled selected>Выберите предмет</option>
+                {% for pr in prs %}
+                    {% if prid == pr[0] %}
+                        <option selected name="prid" value="{{pr[0]}}">{{pr[1]}}</option>
+                    {% else %}
+                        <option name="prid" value="{{pr[0]}}">{{pr[1]}}</option>
+                    {% endif %}
+                {% endfor %}
+        </select>
+        <input type="submit" value="Показать">
+    </form>
+</div>
+
+<div class="table_div">
+    <table>
+        <tr>
+           <th>Дата</th><th>Студент</th><th>Оценка</th>
+        </tr>
+        {% for student in students %}
+            <tr>
+                <td><a href="/students/{{student[0]}}">{{student[11]}}</a></td>
+                <td><a href="/students/{{student[0]}}">{{student[3]}}</a></td>
+                <td><a href="/students/{{student[0]}}">{{student[10]}}</a></td>
+            </tr>
+        {% endfor %}
+</table>
+</div>
+
+{% endblock %}

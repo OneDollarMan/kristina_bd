@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Список предметов</h1>
+
+{% if session.role == 2 %}
+<details>
+    <summary>Добавить предмет</summary>
+    <div class="form_div">
+        <form method="post" action="subjects/add">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <input type="text" name="name" placeholder="Название">
+            <select name="prid">
+                <option disabled selected>Выберите специальность</option>
+                {% for pr in prs %}
+                    <option name="prid" value="{{pr[0]}}">{{pr[1]}}</option>
+                {% endfor %}
+            </select>
+            <input type="number" name="course" placeholder="Курс">
+            <input type="submit" value="Добавить">
+        </form>
+    </div>
+</details>
+{% endif %}
+
+<div class="table_div">
+    <table>
+        <tr>
+           <th>Номер</th><th>Название</th><th>Специальность</th><th>Курс</th><th>Действия</th>
+        </tr>
+        {% for subject in subjects %}
+            <tr>
+                <td>{{subject[0]}}</td>
+                <td>{{subject[1]}}</td>
+                <td>{{subject[5]}}</td>
+                <td>{{subject[3]}}</td>
+                <td><a href="/subjects/rm/{{subject[0]}}">×</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="navigation_div">
+    <ul>
+        <li><a href="/students">< Назад</a></li>
+    </ul>
+</div>
+
+<div class="object_info">
+    <table class="info_table">
+        <caption>Информация о студенте</caption>
+        <tr>
+           <td>Номер</td><td>{{student[0]}}</td>
+        </tr>
+        <tr>
+           <td>ФИО</td><td>{{student[3]}}</td>
+        </tr>
+           <td>Дата рождения</td><td>{{student[4]}}</td>
+        </tr>
+        <tr>
+            <td>Группа</td><td><a href="/groups/{{student[6]}}">{{student[12]}}-{{student[9]}}</a></td>
+        </tr>
+    </table>
+    <table class="info_table">
+        <caption>Список экзаменов</caption>
+        {% for exam in exams %}
+        <tr><td><a href="/exams/{{exam[0]}}">{{exam[6]}} ({{exam[3]}})</a></td></tr>
+        {% endfor %}
+    </table>
+</div>
+
+<a href="/students/rm/{{student[0]}}">
+    <button class="red_button" name="stid" value="{{student[0]}}">Удалить</button>
+</a>
+
+
+{% endblock %}

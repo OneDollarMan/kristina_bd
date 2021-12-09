@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="navigation_div">
+    <ul>
+        <li><a href="/professions">< Назад</a></li>
+    </ul>
+</div>
+
+<div class="object_info">
+    <table class="info_table">
+        <caption>Информация о группе</caption>
+        <tr>
+           <td>Номер</td><td>{{group[0]}}</td>
+        </tr>
+        <tr>
+            <td>Специальность</td><td><a href="/professions/{{group[1]}}">{{group[4]}}</a></td>
+        </tr>
+        <tr>
+           <td>Курс</td><td>{{group[5]}}-{{group[2]}}</td>
+        </tr>
+    </table>
+    <table class="info_table">
+        <caption>Список студентов</caption>
+        {% for student in students %}
+        <tr><td><a href="/students/{{student[0]}}">{{student[3]}} ({{student[4]}})</a></td></tr>
+        {% endfor %}
+    </table>
+</div>
+
+<a href="/groups/rm/{{group[0]}}">
+    <button class="red_button" name="grid" value="{{group[0]}}">Удалить</button>
+</a>
+
+
+{% endblock %}

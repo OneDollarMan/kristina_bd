@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="text_div">
+    Вас приветствует система учета хода учебного процесса. В данный момент в системе зарегистрировано: <br>
+    <ul>
+        <li>{{counts[0]}} специальностей</li>
+        <li>{{counts[1]}} групп</li>
+        <li>{{counts[2]}} пользователей</li>
+        <li>{{counts[3]}} предметов</li>
+        <li>{{counts[4]}} экзаменов</li>
+    </ul>
+</div>
+{% endblock %}

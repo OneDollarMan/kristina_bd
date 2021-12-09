@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Список групп</h1>
+
+{% if session.role == 2 %}
+<details>
+    <summary>Добавить группу</summary>
+    <div class="form_div">
+        <form method="post" action="groups/add">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <select name="prid">
+                <option disabled selected>Выберите специальность</option>
+                {% for pr in prs %}
+                    <option name="prid" value="{{pr[0]}}">{{pr[1]}}</option>
+                {% endfor %}
+            </select>
+            <input type="number" name="course" placeholder="Курс">
+            <input type="submit" value="Добавить">
+        </form>
+    </div>
+</details>
+{% endif %}
+
+<div class="table_div">
+    <table>
+        <tr>
+           <th>Номер</th><th>Специальность</th><th>Курс</th>
+        </tr>
+        {% for group in groups %}
+            <tr>
+                <td><a href="/groups/{{group[0]}}">{{group[0]}}</a></td>
+                <td><a href="/groups/{{group[0]}}">{{group[4]}} ({{group[5]}})</a></td>
+                <td><a href="/groups/{{group[0]}}">{{group[2]}}</a></td>
+            </tr>
+        {% endfor %}
+</table>
+</div>
+
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Список студентов</h1>
+
+{% if session.role == 2 %}
+<details>
+    <summary>Добавить студента</summary>
+    <div class="form_div">
+        <form method="post" action="students/add">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <select name="userid">
+                <option disabled selected>Выберите пользователя</option>
+                {% for user in users %}
+                    <option name="userid" value="{{user[0]}}">{{user[3]}}</option>
+                {% endfor %}
+            </select>
+            <select name="groupid">
+                <option disabled selected>Выберите группу</option>
+                {% for group in groups %}
+                    <option name="groupid" value="{{group[0]}}">{{group[5]}}-{{group[2]}}</option>
+                {% endfor %}
+            </select>
+            <input type="submit" value="Добавить">
+        </form>
+    </div>
+</details>
+{% endif %}
+
+<div class="table_div">
+    <table>
+        <tr>
+           <th>Номер</th><th>ФИО</th><th>Группа</th><th>Действия</th>
+        </tr>
+        {% for student in students %}
+            <tr>
+                <td><a href="/students/{{student[0]}}">{{student[0]}}</a></td>
+                <td><a href="/students/{{student[0]}}">{{student[3]}} ({{student[4]}})</a></td>
+                {% if student[6] %}
+                    <td><a href="/students/{{student[0]}}">{{student[12]}}-{{student[9]}}</a></td>
+                {% else %}
+                    <td><a href="/students/{{student[0]}}">Нет</a></td>
+                {% endif %}
+                <td><a href="/drivers/rm/{{student[0]}}">×</a></td>
+            </tr>
+        {% endfor %}
+</table>
+</div>
+
+{% endblock %}

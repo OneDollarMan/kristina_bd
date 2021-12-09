@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+
+<html lang="ru">
+    <head>
+        <title>Уник - {{title}}</title>
+        <link rel="stylesheet" href="../style.css">
+    </head>
+    <body>
+        <header>
+            <ul class="header_menu">
+                <li><a href="/">Главная</a></li>
+                <li><a href="/professions">Специальности</a></li>
+                <li><a href="/groups">Группы</a></li>
+                <li><a href="/subjects">Предметы</a></li>
+                <li><a href="/students">Студенты</a></li>
+                <li><a href="/exams">Экзамены</a></li>
+            </ul>
+
+            <div class="login_div">
+                {% if session.loggedin %}
+                    {% if session.role == 1 %}
+                        <a href="/students/{{session.id}}">Добро пожаловать, {{ session.username }}</a>
+                    {% else %}
+                        Добро пожаловать, {{ session.username }}
+                    {% endif %}
+                    <a href="/logout">Выйти</a>
+                {% else %}
+                    <a href="/register">Регистрация</a>
+                    <a href="/login">Авторизация</a>
+                {% endif %}
+
+            </div>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <ul class=flashes>
+                        <h2>Уведомления</h2>
+                        {% for message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+
+            <div id="reports">
+                <ul>
+                    <li class="bg">Отчеты</li>
+                    <li><a href="/reports/group">Ведомости групп</a></li>
+                    <li><a href="/reports/student">Успеваемость студентов</a></li>
+                    <li><a href="/reports/subject">Отдельные предметы</a></li>
+                    <li><a href="/reports/rating">Рейтинг студентов</a></li>
+                </ul>
+            </div>
+        </header>
+
+        <div id="content">
+            {% block content %}{% endblock %}
+        </div>
+    </body>
+</html>
