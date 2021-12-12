@@ -165,8 +165,9 @@ def exams():
 @app.route("/exams/add", methods=['POST'])
 def exams_add():
     if session.get('role') == gr.ROLE_SUPERVISOR:
-        if request.form['date'] and request.form['stid'] and request.form['sbid'] and request.form['grade']:
-            gr.add_exam(request.form['date'], int(request.form['stid']), int(request.form['sbid']), int(request.form['grade']))
+        g = int(request.form['grade'])
+        if request.form['date'] and request.form['stid'] and request.form['sbid'] and g > 0:
+            gr.add_exam(request.form['date'], int(request.form['stid']), int(request.form['sbid']), g)
     return redirect(url_for("exams"))
 
 
