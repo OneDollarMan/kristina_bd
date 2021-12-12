@@ -1,3 +1,5 @@
+import hashlib
+
 from flask import url_for, render_template, request, redirect, abort, send_from_directory, g, flash, session
 from __init__ import app
 import forms
@@ -19,7 +21,7 @@ def login():
         return redirect(url_for('index'))
     form = forms.LoginForm()
     if form.validate_on_submit():
-        user = gr.login_user(form.login.data, form.password.data)
+        user = gr.login_user(form.login.data, hashlib.md5(form.password.data.encode('utf-8')).hexdigest())
         if user:
             flash('Вы авторизовались!')
             session['loggedin'] = True
@@ -47,7 +49,7 @@ def register():
         return redirect(url_for('index'))
     form = forms.RegForm()
     if form.validate_on_submit():
-        if gr.register_user(form.username.data, form.fio.data, form.age.data, form.password.data):
+        if gr.register_user(form.username.data, form.fio.data, form.age.data, hashlib.md5(form.password.data.encode('utf-8')).hexdigest()):
             flash('Регистрация успешна!')
             return redirect(url_for('index'))
         else:
@@ -94,9 +96,10 @@ def groups():
 @app.route("/groups/add", methods=['POST'])
 def groups_add():
     if session.get('role') == gr.ROLE_SUPERVISOR:
-        if request.form['prid'] and request.form['course']:
-            gr.add_group(request.form['prid'], request.form['course'])
-    return redirect(url_for("professions"))
+        c = int(request.form['course'])
+        if request.form['prid'] and c > 0:
+            gr.add_group(request.form['prid'], c)
+    return redirect(url_for("groups"))
 
 
 @app.route("/groups/<int:grid>")
@@ -139,14 +142,6 @@ def students_remove(stid):
     return redirect(url_for("students"))
 
 
-@app.route("/students/edit", methods=['POST'])
-def students_edit():
-    if session.get('role') == gr.ROLE_SUPERVISOR:
-        if request.form['name'] and request.form['carid']:
-            gr.edit_driver(int(request.form['driverid']), request.form['name'], int(request.form['carid']))
-    return redirect(url_for("driver", driverid=request.form['driverid']))
-
-
 @app.route("/subjects")
 def subjects():
     return render_template('subjects.html', title="Предметы", prs=gr.get_professions(), subjects=gr.get_subjects())
@@ -155,8 +150,9 @@ def subjects():
 @app.route("/subjects/add", methods=['POST'])
 def subjects_add():
     if session.get('role') == gr.ROLE_SUPERVISOR:
-        if request.form['name'] and request.form['prid'] and request.form['course']:
-            gr.add_subject(request.form['name'], request.form['prid'], request.form['course'])
+        c = int(request.form['course'])
+        if request.form['name'] and request.form['prid'] and c > 0:
+            gr.add_subject(request.form['name'], request.form['prid'], c)
     return redirect(url_for("subjects"))
 
 
