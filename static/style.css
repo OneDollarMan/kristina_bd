@@ -211,7 +211,7 @@ details {
 .object_info {
     padding: 10pt;
     display:flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: flex-start;
 }
 

@@ -19,7 +19,6 @@
 -- Table structure for table `exam`
 --
 
-DROP TABLE IF EXISTS `exam`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `exam` (
@@ -46,7 +45,6 @@ UNLOCK TABLES;
 -- Table structure for table `group`
 --
 
-DROP TABLE IF EXISTS `group`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `group` (

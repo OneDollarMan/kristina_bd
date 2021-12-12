@@ -26,6 +26,15 @@
         <tr><td><a href="/groups/{{group[0]}}">{{group[5]}}-{{group[2]}}</a></td></tr>
         {% endfor %}
     </table>
+
+</div>
+<div class="object_info">
+    <table class="info_table">
+        <caption>Список предметов</caption>
+        {% for sb in sbs %}
+        <tr><td>{{sb[1]}}</td></tr>
+        {% endfor %}
+    </table>
 </div>
 
 <a href="/profession/rm/{{pr[0]}}">

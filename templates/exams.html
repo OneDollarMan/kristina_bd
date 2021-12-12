@@ -2,38 +2,51 @@
 {% block content %}
 <h1>Список экзаменов</h1>
 
-{% if session.role == 2 %}
-<details>
-    <summary>Добавить экзамен</summary>
-    <div class="form_div">
-        <form method="post" action="exams/add">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-            <input type="datetime-local" name="date"/>
-            <select name="stid">
-                <option disabled selected>Выберите студента</option>
-                {% for st in sts %}
-                    <option name="stid" value="{{st[0]}}">{{st[3]}}</option>
-                {% endfor %}
-            </select>
-            <select name="sbid">
-                <option disabled selected>Выберите предмет</option>
-                {% for sb in sbs %}
-                    <option name="sbid" value="{{sb[0]}}">{{sb[1]}}</option>
-                {% endfor %}
-            </select>
-            <input type="number" name="grade" placeholder="Оценка">
-            <input type="submit" value="Добавить">
-        </form>
-    </div>
-</details>
-{% endif %}
-
 <div class="table_div">
-    <table>
-        <tr>
-           <th>Номер</th><th>Дата</th><th>Студент</th><th>Предмет</th><th>Оценка</th>
-        </tr>
-        {% for exam in exams %}
+    {% for pr in prs %}
+    <details>
+        <summary>{{pr[1]}}</summary>
+
+        {% if session.role == 2 %}
+        <details>
+            <summary>Добавить экзамен</summary>
+            <div class="form_div">
+                <form method="post" action="exams/add">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <input type="datetime-local" name="date"/>
+                    <select name="stid">
+                        <option disabled selected>Выберите студента</option>
+                        {% for st in sts %}
+                        {% if st[10] == pr[0] %}
+                        <option name="stid" value="{{st[0]}}">{{st[3]}}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                    <select name="sbid">
+                        <option disabled selected>Выберите предмет</option>
+                        {% for sb in sbs %}
+                        {% if sb[2] == pr[0] %}
+                        <option name="sbid" value="{{sb[0]}}">{{sb[1]}}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                    <input type="number" name="grade" placeholder="Оценка">
+                    <input type="submit" value="Добавить">
+                </form>
+            </div>
+        </details>
+        {% endif %}
+
+        <table>
+            <tr>
+                <th>Номер</th>
+                <th>Дата</th>
+                <th>Студент</th>
+                <th>Предмет</th>
+                <th>Оценка</th>
+            </tr>
+            {% for exam in exams %}
+            {% if exam[14] == pr[0] %}
             <tr>
                 <td>{{exam[0]}}</td>
                 <td>{{exam[4]}}</td>
@@ -41,7 +54,10 @@
                 <td>{{exam[13]}}</td>
                 <td>{{exam[3]}}</td>
             </tr>
-        {% endfor %}
-    </table>
+            {% endif %}
+            {% endfor %}
+        </table>
+    </details>
+    {% endfor %}
 </div>
 {% endblock %}

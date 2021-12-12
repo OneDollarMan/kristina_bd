@@ -73,7 +73,7 @@ def professions_add():
 def profession(prid):
     if session.get('role') == gr.ROLE_SUPERVISOR:
         return render_template('profession.html', title="Специальность", pr=gr.get_profession(prid)[0],
-                               groups=gr.get_groups_of_pr(prid))
+                               groups=gr.get_groups_of_pr(prid), sbs=gr.get_subjects_of_profession(prid))
     else:
         return redirect(url_for('professions'))
 
@@ -116,10 +116,9 @@ def students():
 
 @app.route("/students/<int:stid>")
 def student(stid):
-    print(gr.get_student_exams(stid))
     if session.get('role') == gr.ROLE_SUPERVISOR or session.get('id') == stid:
         return render_template('student.html', title="Студент", student=gr.get_student(stid)[0],
-                               exams=gr.get_student_exams(stid))
+                               exams=gr.get_student_exams(stid), avg=gr.get_average(stid))
     else:
         return redirect(url_for('students'))
 
@@ -164,14 +163,14 @@ def subjects_add():
 @app.route("/exams")
 def exams():
     return render_template('exams.html', title="Экзамены", exams=gr.get_exams(), sts=gr.get_students(),
-                           sbs=gr.get_subjects())
+                           sbs=gr.get_subjects(), prs=gr.get_professions())
 
 
 @app.route("/exams/add", methods=['POST'])
 def exams_add():
     if session.get('role') == gr.ROLE_SUPERVISOR:
         if request.form['date'] and request.form['stid'] and request.form['sbid'] and request.form['grade']:
-            gr.add_exam(request.form['date'], request.form['stid'], request.form['sbid'], request.form['grade'])
+            gr.add_exam(request.form['date'], int(request.form['stid']), int(request.form['sbid']), int(request.form['grade']))
     return redirect(url_for("exams"))
 
 
@@ -183,6 +182,35 @@ def reports_group():
             p = gr.get_subject(int(request.form['prid']))[0]
             return render_template('reports_group.html', title="%s-%s" % (g[5], g[2]), grid=g[2], prid=p[0], grs=gr.get_groups(), prs=gr.get_subjects(), students=gr.get_exam_grade(int(request.form['grid']), int(request.form['prid'])))
         return render_template('reports_group.html', title="Отчеты", grs=gr.get_groups(), prs=gr.get_subjects())
+    else:
+        return redirect(url_for("index"))
+
+
+@app.route("/reports/student", methods=['GET', 'POST'])
+def reports_student():
+    if session.get('role') == gr.ROLE_SUPERVISOR:
+        if request.method == 'POST':
+            return render_template('reports_student.html', title="Отчеты", c=request.form['cat'], students=gr.get_student_report(int(request.form['cat'])))
+        return render_template('reports_student.html', title="Отчеты")
+    else:
+        return redirect(url_for("index"))
+
+
+@app.route("/reports/subject", methods=['GET', 'POST'])
+def reports_subject():
+    if session.get('role') == gr.ROLE_SUPERVISOR:
+        if request.method == 'POST':
+            sb = gr.get_subject(int(request.form['sbid']))[0]
+            return render_template('reports_subject.html', title=sb[1], sbid=sb[0], sbs=gr.get_subjects(), students=gr.get_subject_exam(int(request.form['sbid'])))
+        return render_template('reports_subject.html', title="Отчеты", sbs=gr.get_subjects())
+    else:
+        return redirect(url_for("index"))
+
+
+@app.route("/reports/rating", methods=['GET'])
+def reports_rating():
+    if session.get('role') == gr.ROLE_SUPERVISOR:
+        return render_template('reports_rating.html', title="Отчеты", students=gr.get_students_rating())
     else:
         return redirect(url_for("index"))
 

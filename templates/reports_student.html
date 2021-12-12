@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Отчеты - Студенты</h1>
+
+<div class="form_div">
+    <form method="post" action="/reports/student">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <select name="cat">
+            <option disabled selected>Выберите категорию</option>
+            {% if c == '0' %}
+                <option selected name="cat" value="0">С тройками</option>
+                <option name="cat" value="1">Без троек</option>
+                <option name="cat" value="2">Отличники</option>
+            {% elif c == '1' %}
+                <option name="cat" value="0">С тройками</option>
+                <option selected name="cat" value="1">Без троек</option>
+                <option name="cat" value="2">Отличники</option>
+            {% elif c == '2' %}
+                <option name="cat" value="0">С тройками</option>
+                <option name="cat" value="1">Без троек</option>
+                <option selected name="cat" value="2">Отличники</option>
+            {% else %}
+                <option name="cat" value="0">С тройками</option>
+                <option name="cat" value="1">Без троек</option>
+                <option name="cat" value="2">Отличники</option>
+            {% endif %}
+        </select>
+        <input type="submit" value="Показать">
+    </form>
+</div>
+
+<div class="table_div">
+    <table>
+        <tr>
+           <th>Студент</th>
+        </tr>
+        {% for student in students %}
+            <tr>
+                <td><a href="/students/{{student[0]}}">{{student[3]}}</a></td>
+            </tr>
+        {% endfor %}
+</table>
+</div>
+
+{% endblock %}

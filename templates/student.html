@@ -21,11 +21,14 @@
         <tr>
             <td>Группа</td><td><a href="/groups/{{student[6]}}">{{student[12]}}-{{student[9]}}</a></td>
         </tr>
+        </tr>
+           <td>Средний балл</td><td>{{avg[2]}}</td>
+        </tr>
     </table>
     <table class="info_table">
         <caption>Список экзаменов</caption>
         {% for exam in exams %}
-        <tr><td><a href="/exams/{{exam[0]}}">{{exam[6]}} ({{exam[3]}})</a></td></tr>
+        <tr><td><a href="/exams">{{exam[6]}} ({{exam[3]}})</a></td></tr>
         {% endfor %}
     </table>
 </div>

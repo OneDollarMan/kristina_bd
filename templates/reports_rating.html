@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Отчеты - Рейтинг студентов</h1>
+
+<div class="table_div">
+    <table>
+        <tr>
+           <th>Студент</th><th>Средний балл</th>
+        </tr>
+        {% for student in students %}
+            <tr>
+                <td><a href="/students/{{student[0]}}">{{student[3]}}</a></td>
+                <td><a href="/students/{{student[0]}}">{{student[9]}}</a></td>
+            </tr>
+        {% endfor %}
+</table>
+</div>
+
+{% endblock %}

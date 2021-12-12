@@ -38,33 +38,24 @@ class GarageRepo:
 
         self.get_student = lambda id: self.raw_query("SELECT * FROM user JOIN university.group gr, profession pr WHERE user.group=gr.id AND gr.profession=pr.id AND user.id = %d" % id)
         self.get_students = lambda: self.raw_query("SELECT * FROM user JOIN university.group gr, profession pr WHERE user.group=gr.id AND gr.profession=pr.id AND user.role=1")
-        self.add_student = lambda userid, groupid: self.write_query(
-            "UPDATE user SET role=1, user.group=(SELECT id FROM university.group WHERE id = '%d') WHERE id=%d" % (int(groupid), int(userid)))
         self.get_students_of_group = lambda grid: self.raw_query("SELECT * FROM user WHERE user.group = %d" % grid)
         self.remove_student = lambda stid: self.write_query("UPDATE user SET role=0, user.group=0 WHERE id=%d" % int(stid))
-        self.edit_driver = lambda driverid, name, carid: self.write_query(
-            "UPDATE user SET fio = '%s', car = %d WHERE iduser = %d" % (name, carid, driverid))
         self.get_student_exams = lambda stid: self.raw_query("SELECT * FROM exam JOIN subject s ON exam.subject=s.id AND student = %d" % stid)
+        self.get_student_marks = lambda stid: self.get_list_query("SELECT grade FROM exam WHERE student='%d'" % stid)
+        self.get_average = lambda student: self.get_query("SELECT * FROM average WHERE student='%d'" % student)
+        self.get_students_rating = lambda: self.raw_query("SELECT * FROM user JOIN average a ON user.id=a.student WHERE role=1 ORDER BY a.score DESC")
+        self.get_3_students = lambda: self.raw_query("SELECT * FROM user WHERE id=(SELECT student FROM exam WHERE exam.grade=3)")
+        self.get_5_students = lambda: self.raw_query("SELECT * FROM user WHERE id=(SELECT student FROM average WHERE score=5)")
+        self.get_4_students = lambda: self.raw_query("SELECT * FROM user WHERE user.id IN (SELECT exam.student FROM exam WHERE exam.grade = 4) and user.id NOT IN (SELECT exam.student FROM exam WHERE exam.grade = 3)")
 
         self.get_subjects = lambda: self.raw_query("SELECT * FROM subject JOIN profession pr ON subject.profession=pr.id")
         self.add_subject = lambda name, prid, course: self.write_query("INSERT INTO subject SET name='%s', profession='%d', course='%d'" % (name, int(prid), int(course)))
         self.rm_subject = lambda gasid: self.write_query("DELETE FROM gas WHERE idgas='%d'" % gasid)
         self.get_subject = lambda prid: self.raw_query("SELECT * FROM subject WHERE id='%d'" % prid)
+        self.get_subject_exam = lambda sbid: self.raw_query("SELECT * FROM exam JOIN user u, subject s WHERE student=u.id AND exam.subject=s.id AND subject='%d'" % sbid)
+        self.get_subjects_of_profession = lambda prid: self.raw_query("SELECT * FROM subject JOIN profession pr ON subject.profession=pr.id WHERE subject.profession='%d'" % prid)
 
         self.get_exams = lambda: self.raw_query("SELECT * FROM exam JOIN user u, subject s WHERE exam.student=u.id AND exam.subject=s.id")
-        self.get_station = lambda stationid: self.raw_query("SELECT * FROM station WHERE idstation=%d" % stationid)
-        self.add_exam = lambda date, stid, sbid, grade: self.write_query("INSERT INTO exam SET date='%s', student='%d', subject='%d', grade='%d'" % (date, int(stid), int(sbid), int(grade)))
-        self.rm_station = lambda stationid: self.write_query("DELETE FROM station WHERE idstation='%d'" % stationid)
-
-        self.add_tr = lambda datetime, driverid, gasid, stationid, amount: self.write_query(
-            "INSERT INTO transportation SET date='%s', driver='%d', gas=%d, station=%d, gas_amount=%d" %
-            (datetime, driverid, gasid, stationid, amount))
-        self.get_trs = lambda: self.get_double_list_query(
-            "SELECT * FROM transportation JOIN user, gas, station, var WHERE driver=iduser AND gas=idgas AND station=idstation AND status=idvar")
-        self.get_tr = lambda trid: self.get_one_list_query("SELECT * FROM transportation JOIN user, gas, station, var WHERE idtransportation=%d AND driver=iduser AND gas=idgas AND station=idstation AND status=idvar" % trid)
-        self.edit_tr_status = lambda trid, status: self.raw_query("UPDATE transportation SET status=%d WHERE idtransportation=%d" % (status, trid))
-
-        self.get_vars = lambda: self.raw_query("SELECT * FROM var")
 
         self.get_professions_count = lambda: self.get_one_query("SELECT COUNT(1) FROM profession")
         self.get_groups_count = lambda: self.get_one_query("SELECT COUNT(1) FROM university.group")
@@ -107,16 +98,10 @@ class GarageRepo:
             self.cursor.execute(query)
             return self.cursor.fetchone()
 
-    def remove_profession(self, prid):
-        if prid:
-            self.write_query("UPDATE university.group SET profession = NULL WHERE profession = %d" % prid)
-            self.rm_profession(prid)
-
-    def add_transportation(self, gasid, amount, datetime, driverid, stationid):
-        q = self.get_one_query("SELECT remain FROM gas WHERE idgas=%d" % gasid)
-        if q >= amount:
-            self.add_tr(datetime, driverid, gasid, stationid, amount)
-            self.change_gas_amount(gasid=gasid, amount=-amount)
+    def get_list_query(self, query):
+        if self.cursor and query:
+            self.cursor.execute(query)
+            return [list[0] for list in self.cursor.fetchall()]
 
     def register_user(self, username, fio, age, password):
         if not self.get_user(username):
@@ -125,4 +110,23 @@ class GarageRepo:
         else:
             return False
 
+    def add_student(self, userid, groupid):
+        self.write_query("UPDATE user SET role=1, user.group=(SELECT id FROM university.group WHERE id = '%d') WHERE id=%d" % (int(groupid), int(userid)))
+        self.write_query("INSERT INTO average SET student='%d'" % userid)
 
+    def recalc_average(self, student):
+        a_list = self.get_student_marks(student)
+        a = sum(a_list)/len(a_list)
+        self.write_query("UPDATE average SET score='%f' WHERE student='%s'" % (a, student))
+
+    def add_exam(self, date, stid, sbid, grade):
+        self.write_query("INSERT INTO exam SET date='%s', student='%d', subject='%d', grade='%d'" % (date, int(stid), int(sbid), int(grade)))
+        self.recalc_average(stid)
+
+    def get_student_report(self, cat):
+        if cat == 0:
+            return self.get_3_students()
+        elif cat == 1:
+            return self.get_4_students()
+        else:
+            return self.get_5_students()
