@@ -84,7 +84,7 @@ def profession(prid):
 def professions_rm(prid):
     if session.get('role') == gr.ROLE_SUPERVISOR:
         if prid:
-            gr.remove_profession(prid)
+            gr.rm_profession(prid)
     return redirect(url_for("professions"))
 
 
@@ -111,6 +111,14 @@ def group(grid):
         return redirect(url_for('groups'))
 
 
+@app.route("/groups/rm/<int:id>")
+def groups_remove(id):
+    if session.get('role') == gr.ROLE_SUPERVISOR:
+        if id:
+            gr.remove_group(id)
+    return redirect(url_for("groups"))
+
+
 @app.route("/students")
 def students():
     return render_template('students.html', title="Студенты", students=gr.get_students(), groups=gr.get_groups(),
@@ -130,7 +138,7 @@ def student(stid):
 def students_add():
     if session.get('role') == gr.ROLE_SUPERVISOR:
         if request.form['userid'] and request.form['groupid']:
-            gr.add_student(request.form['userid'], request.form['groupid'])
+            gr.add_student(int(request.form['userid']), int(request.form['groupid']))
     return redirect(url_for("students"))
 
 
@@ -156,6 +164,14 @@ def subjects_add():
     return redirect(url_for("subjects"))
 
 
+@app.route("/subjects/rm/<int:id>")
+def subjects_rm(id):
+    if session.get('role') == gr.ROLE_SUPERVISOR:
+        if id:
+            gr.remove_subject(id)
+    return redirect(url_for("subjects"))
+
+
 @app.route("/exams")
 def exams():
     return render_template('exams.html', title="Экзамены", exams=gr.get_exams(), sts=gr.get_students(),
@@ -168,6 +184,14 @@ def exams_add():
         g = int(request.form['grade'])
         if request.form['date'] and request.form['stid'] and request.form['sbid'] and g > 0:
             gr.add_exam(request.form['date'], int(request.form['stid']), int(request.form['sbid']), g)
+    return redirect(url_for("exams"))
+
+
+@app.route("/exams/rm/<int:id>")
+def exams_remove(id):
+    if session.get('role') == gr.ROLE_SUPERVISOR:
+        if id:
+            gr.rm_exam(id)
     return redirect(url_for("exams"))
 
 

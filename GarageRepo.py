@@ -31,7 +31,7 @@ class GarageRepo:
         self.add_group = lambda prof, course: self.write_query(
             "INSERT INTO university.group SET profession='%d', course='%d'" % (int(prof), int(course)))
         self.get_groups = lambda: self.raw_query("SELECT * FROM university.group JOIN profession pr ON profession=pr.id")
-        self.rm_group = lambda id: self.write_query("DELETE FROM university.group WHERE id=%d)" % int(id))
+        self.rm_group = lambda id: self.write_query("DELETE FROM university.group WHERE id=%d" % int(id))
         self.get_group = lambda id: self.raw_query("SELECT * FROM university.group JOIN profession pr ON profession=pr.id WHERE university.group.id=%d" % id)
         self.get_groups_of_pr = lambda prid: self.raw_query("SELECT * FROM university.group JOIN profession pr ON profession=pr.id='%d'" % int(prid))
         self.get_exam_grade = lambda grid, sbid: self.raw_query("SELECT * FROM user u JOIN exam e ON u.id=e.student WHERE u.group='%d' AND e.subject='%d'" % (grid, sbid))
@@ -47,15 +47,19 @@ class GarageRepo:
         self.get_3_students = lambda: self.raw_query("SELECT * FROM user WHERE id=(SELECT student FROM exam WHERE exam.grade=3)")
         self.get_5_students = lambda: self.raw_query("SELECT * FROM user WHERE id=(SELECT student FROM average WHERE score=5)")
         self.get_4_students = lambda: self.raw_query("SELECT * FROM user WHERE user.id IN (SELECT exam.student FROM exam WHERE exam.grade = 4) and user.id NOT IN (SELECT exam.student FROM exam WHERE exam.grade = 3)")
+        self.rm_student = lambda id: self.write_query("DELETE FROM user WHERE id='%d'" % id)
+        self.rm_group_students = lambda id: self.write_query("UPDATE user SET user.group=0, user.role=0 WHERE id='%d'" % id)
 
         self.get_subjects = lambda: self.raw_query("SELECT * FROM subject JOIN profession pr ON subject.profession=pr.id")
         self.add_subject = lambda name, prid, course: self.write_query("INSERT INTO subject SET name='%s', profession='%d', course='%d'" % (name, int(prid), int(course)))
-        self.rm_subject = lambda gasid: self.write_query("DELETE FROM gas WHERE idgas='%d'" % gasid)
+        self.rm_subject = lambda id: self.write_query("DELETE FROM subject WHERE id='%d'" % id)
         self.get_subject = lambda prid: self.raw_query("SELECT * FROM subject WHERE id='%d'" % prid)
         self.get_subject_exam = lambda sbid: self.raw_query("SELECT * FROM exam JOIN user u, subject s WHERE student=u.id AND exam.subject=s.id AND subject='%d'" % sbid)
         self.get_subjects_of_profession = lambda prid: self.raw_query("SELECT * FROM subject JOIN profession pr ON subject.profession=pr.id WHERE subject.profession='%d'" % prid)
 
         self.get_exams = lambda: self.raw_query("SELECT * FROM exam JOIN user u, subject s WHERE exam.student=u.id AND exam.subject=s.id")
+        self.rm_exam = lambda id: self.write_query("DELETE * FROM exam WHERE id='%d'" % id)
+        self.rm_student_exams = lambda id: self.write_query("DELETE FROM exam WHERE student='%d'" % id)
 
         self.get_professions_count = lambda: self.get_one_query("SELECT COUNT(1) FROM profession")
         self.get_groups_count = lambda: self.get_one_query("SELECT COUNT(1) FROM university.group")
@@ -79,6 +83,7 @@ class GarageRepo:
 
     def raw_query(self, query):
         if self.cursor and query:
+            self.cursor.clear_attributes()
             self.cursor.execute(query)
             return self.cursor.fetchall()
 
@@ -130,3 +135,15 @@ class GarageRepo:
             return self.get_4_students()
         else:
             return self.get_5_students()
+
+    def remove_student(self, id):
+        self.rm_student_exams(id)
+        self.rm_student(id)
+
+    def remove_subject(self, id):
+        self.rm_subject_exams(id)
+        self.rm_subject(id)
+
+    def remove_group(self, id):
+        self.rm_group_students(id)
+        self.rm_group(id)

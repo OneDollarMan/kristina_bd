@@ -44,6 +44,7 @@
                 <th>Студент</th>
                 <th>Предмет</th>
                 <th>Оценка</th>
+                <th>Действия</th>
             </tr>
             {% for exam in exams %}
             {% if exam[14] == pr[0] %}
@@ -53,6 +54,7 @@
                 <td>{{exam[8]}}</td>
                 <td>{{exam[13]}}</td>
                 <td>{{exam[3]}}</td>
+                <th><a href="/exams/rm/{{exam[0]}}">×</a></th>
             </tr>
             {% endif %}
             {% endfor %}
